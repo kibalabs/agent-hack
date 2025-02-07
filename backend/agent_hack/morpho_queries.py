@@ -1,6 +1,5 @@
-
 LIST_CHAIN_ASSETS_QUERY = '''
-query ListChainAssets($skip: Int!,$chainId: Int!) {
+query ListChainAssets($skip: Int!, $chainId: Int!) {
   assets(first: 1000, skip: $skip, where: {chainId_in: [$chainId]}) {
     pageInfo {
       countTotal
@@ -8,6 +7,45 @@ query ListChainAssets($skip: Int!,$chainId: Int!) {
       limit
       skip
     }
+    items {
+      id
+      address
+      decimals
+      name
+      symbol
+      tags
+      logoURI
+      totalSupply
+      priceUsd
+      oraclePriceUsd
+      spotPriceEth
+  }
+}
+'''
+
+GET_CHAIN_ASSET_QUERY = '''
+query GetChainAsset($chainId: Int!, $assetSymbol: String!) {
+  assets(where: {chainId_in: [$chainId], symbol_in: [$assetSymbol]}) {
+    items {
+      id
+      address
+      decimals
+      name
+      symbol
+      tags
+      logoURI
+      totalSupply
+      priceUsd
+      oraclePriceUsd
+      spotPriceEth
+    }
+  }
+}
+'''
+
+GET_CHAIN_ASSET_BY_ADDRESS_QUERY = '''
+query GetChainAssetByAddress($chainId: Int!, $assetAddress: String!) {
+  assets(where: {chainId_in: [$chainId], address_in: [$assetAddress]}) {
     items {
       id
       address
@@ -84,11 +122,6 @@ query ListChainAssetVaults($skip: Int!, $chainId: Int!, $assetAddress: String!) 
           asset {
             id
             address
-            chain {
-              id
-              network
-              currency
-            }
             decimals
             name
             symbol
