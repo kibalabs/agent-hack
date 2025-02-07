@@ -1,7 +1,10 @@
 from typing import Callable
-from cdp import Wallet, hash_message
+
+from cdp import Wallet
+from cdp import hash_message
 from cdp_agentkit_core.actions import CdpAction
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+from pydantic import Field
 
 SIGN_MESSAGE_PROMPT = """
 This tool will sign arbitrary messages using EIP-191 Signed Message Standard hashing.
@@ -26,9 +29,9 @@ def sign_message(wallet: Wallet, message: str) -> str:
         str: The message and corresponding signature.
 
     """
-    payload_signature = wallet.sign_payload(hash_message(message)).wait()
+    signature = wallet.sign_payload(hash_message(message)).wait()
 
-    return f"The payload signature {payload_signature}"
+    return f"The payload signature {signature}"
 
 
 class SignMessageAction(CdpAction):

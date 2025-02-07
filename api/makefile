@@ -5,26 +5,26 @@ list-outdated: install
 	@ pip list -o
 
 lint-check:
-	@ lint-check *.py ./carlistings
+	@ lint-check *.py ./agent_hack
 
 lint-check-ci:
-	@ lint-check *.py ./carlistings --output-file lint-check-results.json --output-format annotations
+	@ lint-check *.py ./agent_hack --output-file lint-check-results.json --output-format annotations
 
 lint-fix:
-	@ isort --sl -l 1000 *.py ./carlistings
-	@ lint-check *.py ./carlistings
+	@ isort --sl -l 1000 *.py ./agent_hack
+	@ lint-check *.py ./agent_hack
 
 type-check:
-	@ type-check *.py ./carlistings
+	@ type-check *.py ./agent_hack
 
 type-check-ci:
-	@ type-check *.py ./carlistings --output-file type-check-results.json --output-format annotations
+	@ type-check *.py ./agent_hack --output-file type-check-results.json --output-format annotations
 
 security-check:
-	@ security-check *.py ./carlistings
+	@ security-check *.py ./agent_hack
 
 security-check-ci:
-	@ security-check *.py ./carlistings --output-file security-check-results.json --output-format annotations
+	@ security-check *.py ./agent_hack --output-file security-check-results.json --output-format annotations
 
 build:
 	@ echo "Not Supported"

@@ -12,9 +12,9 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 
-from sign_message_action import SignMessageAction
+from agent_hack.sign_message_action import SignMessageAction
 
-walletDataFilePath = "../secrets/walletData.json"
+WALLET_DATA_FILE_PATH = "../secrets/walletData.json"
 
 GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 # OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
@@ -28,14 +28,14 @@ async def initialize_agent():
         "cdp_api_key_private_key": CDP_API_KEY_PRIVATE_KEY,
         "network_id": NETWORK_ID,
     }
-    if os.path.exists(walletDataFilePath):
-        walletData = await file_util.read_file(filePath=walletDataFilePath)
+    if os.path.exists(WALLET_DATA_FILE_PATH):
+        walletData = await file_util.read_file(filePath=WALLET_DATA_FILE_PATH)
         values["cdp_wallet_data"] = walletData
     agentkit = CdpAgentkitWrapper(**values)
     walletData = agentkit.export_wallet()
-    await file_util.write_file(filePath=walletDataFilePath, content=walletData)
-    cdp_toolkit = CdpToolkit.from_cdp_agentkit_wrapper(cdp_agentkit_wrapper=agentkit)
-    tools = cdp_toolkit.get_tools()
+    await file_util.write_file(filePath=WALLET_DATA_FILE_PATH, content=walletData)
+    cdpToolkit = CdpToolkit.from_cdp_agentkit_wrapper(cdp_agentkit_wrapper=agentkit)
+    tools = cdpToolkit.get_tools()
     signMessageAction = SignMessageAction()
     tools.append(
         CdpTool(
@@ -75,7 +75,7 @@ async def initialize_agent():
 
 
 # Autonomous Mode
-def run_autonomous_mode(agent_executor, config, interval=10):
+def run_autonomous_mode(agentExecutor, config, interval=10):
     """Run the agent autonomously with specified intervals."""
     print("Starting autonomous mode...")
     while True:
@@ -87,7 +87,7 @@ def run_autonomous_mode(agent_executor, config, interval=10):
             )
 
             # Run agent in autonomous mode
-            for chunk in agent_executor.stream(
+            for chunk in agentExecutor.stream(
                 {"messages": [HumanMessage(content=thought)]}, config
             ):
                 if "agent" in chunk:
@@ -105,18 +105,18 @@ def run_autonomous_mode(agent_executor, config, interval=10):
 
 
 # Chat Mode
-def run_chat_mode(agent_executor, config):
+def run_chat_mode(agentExecutor, config):
     """Run the agent interactively based on user input."""
     print("Starting chat mode... Type 'exit' to end.")
     while True:
         try:
-            user_input = input("\nPrompt: ")
-            if user_input.lower() == "exit":
+            userInput = input("\nPrompt: ")
+            if userInput.lower() == "exit":
                 break
 
             # Run agent with the user's input in chat mode
-            for chunk in agent_executor.stream(
-                {"messages": [HumanMessage(content=user_input)]}, config
+            for chunk in agentExecutor.stream(
+                {"messages": [HumanMessage(content=userInput)]}, config
             ):
                 if "agent" in chunk:
                     print(chunk["agent"]["messages"][0].content)
@@ -140,20 +140,20 @@ def choose_mode():
         choice = input("\nChoose a mode (enter number or name): ").lower().strip()
         if choice in ["1", "chat"]:
             return "chat"
-        elif choice in ["2", "auto"]:
+        if choice in ["2", "auto"]:
             return "auto"
         print("Invalid choice. Please try again.")
 
 
 async def main():
-    agent_executor, config = await initialize_agent()
+    print("Starting Agent...")
+    agentExecutor, config = await initialize_agent()
     mode = choose_mode()
     if mode == "chat":
-        run_chat_mode(agent_executor=agent_executor, config=config)
+        run_chat_mode(agentExecutor=agentExecutor, config=config)
     elif mode == "auto":
-        run_autonomous_mode(agent_executor=agent_executor, config=config)
+        run_autonomous_mode(agentExecutor=agentExecutor, config=config)
 
 
 if __name__ == "__main__":
-    print("Starting Agent...")
     asyncio.run(main())

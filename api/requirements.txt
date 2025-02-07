@@ -1,4 +1,4 @@
 cdp-langchain==0.0.13
 langchain-google-genai==2.0.9
--e /Users/krishan/Projects/core-py[requester,api,storage]
+-e /Users/krishan/Projects/core-py[requester,api,storage,web3]
 # kiba-core[requester, api, storage]==0.5.3.dev6
