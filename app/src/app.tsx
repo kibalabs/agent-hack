@@ -8,6 +8,7 @@ import { Web3AccountControlProvider } from '@kibalabs/web3-react';
 
 import { GlobalsProvider, IGlobals } from './GlobalsContext';
 import { PageDataProvider } from './PageDataContext';
+import { ChatPage } from './pages/ChatPage';
 import { HomePage } from './pages/HomePage';
 import { buildHookeTheme } from './theme';
 
@@ -31,6 +32,7 @@ export const globals: IGlobals = {
 };
 
 export const routes: IRoute<IGlobals>[] = [
+  { path: '/chat', page: ChatPage },
   { path: '/', page: HomePage },
 ];
 

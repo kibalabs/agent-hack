@@ -1,12 +1,20 @@
 import React from 'react';
 
+import { useNavigator } from '@kibalabs/core-react';
 import { Alignment, Button, Direction, PaddingSize, Spacing, Stack, Text } from '@kibalabs/ui-react';
 import { useOnLinkWeb3AccountsClicked, useWeb3Account, useWeb3ChainId } from '@kibalabs/web3-react';
 
 export function HomePage(): React.ReactElement {
+  const navigator = useNavigator();
   const chainId = useWeb3ChainId();
   const account = useWeb3Account();
   const onLinkAccountsClicked = useOnLinkWeb3AccountsClicked();
+
+  React.useEffect((): void => {
+    if (chainId === 8453 && account != null) {
+      navigator.navigateTo('/chat');
+    }
+  }, [chainId, account, navigator]);
 
   const onConnectWalletClicked = async () => {
     await onLinkAccountsClicked();
@@ -25,10 +33,10 @@ export function HomePage(): React.ReactElement {
       <Text variant='header1'>Yield Seeker</Text>
       <Spacing variant={PaddingSize.Wide} />
       <Text variant='bold-large'>The Best AI Agent for Maximizing Crypto Yields</Text>
-      <Spacing variant={PaddingSize.Wide2} />
+      <Spacing variant={PaddingSize.Wide3} />
       {chainId == null || account == null ? (
         <Button
-          variant='primary'
+          variant='tertiary-large'
           text='Connect Wallet'
           onClicked={onConnectWalletClicked}
         />
@@ -37,7 +45,7 @@ export function HomePage(): React.ReactElement {
           <Text variant='large'>Unsupported network, only base is supported</Text>
           <Spacing />
           <Button
-            variant='primary'
+            variant='tertiary-large'
             text='Switch to base'
             onClicked={onSwitchToBaseClicked}
           />
@@ -45,6 +53,7 @@ export function HomePage(): React.ReactElement {
       ) : (
         <Text variant='large'>
           Connected to
+          {' '}
           {account.address}
         </Text>
       )}

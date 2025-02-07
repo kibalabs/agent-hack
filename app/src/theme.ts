@@ -138,10 +138,10 @@ export const buildHookeTheme = (): ITheme => {
     },
     inputWrappers: {
       default: {
-        disabled: {
+        normal: {
           default: {
             background: {
-              opacity: '0.2',
+              'background-color': 'transparent',
             },
           },
         },
