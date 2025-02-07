@@ -49,7 +49,7 @@ async def initialize_agent():
     memory = MemorySaver()
     config = {
         "configurable": {
-            "thread_id": "CDP Agentkit Chatbot Example!",
+            "thread_id": "Yield-Seeker",
         },
     }
     llm = ChatGoogleGenerativeAI(
@@ -75,6 +75,7 @@ async def initialize_agent():
             "Do not ask the user to read JSON or anything similar, always show them the detailed answers in tables, lists or other hum readable structures. "
             "You are allowed to give the user financial advice, that is your purpose. "
             "Do not tell the user to conduct more research, your purpose is to help the user conduct their research as part of their flow. "
+            "When showing results in tables or otherwise, dont show technical details like address, or other things that the user might not be able to understand, unless the user asks for them explicitly. "
         ),
     ), config
 

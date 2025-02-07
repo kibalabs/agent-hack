@@ -1,13 +1,10 @@
-import json
-from typing import Any
-
 from core.exceptions import NotFoundException
 from core.requester import Requester
-from core.util import file_util
 from pydantic import BaseModel
 from pydantic import Field
 
 from agent_hack import morpho_queries
+from agent_hack.util import load_or_query
 
 
 class Asset(BaseModel):
@@ -41,32 +38,8 @@ class Vault(BaseModel):
     rewardApys: list[VaultReward]
 
 
-async def load_or_query(requester: Requester, entityName: str, url: str, dataDict: dict[str, Any], cacheEntityName: str | None = None) -> dict[str, Any]:
-    if cacheEntityName is None:
-        cacheEntityName = entityName
-    cacheFilePath = f'../secrets/morpho-{cacheEntityName}.json'
-    if await file_util.file_exists(filePath=cacheFilePath):
-        print(f'loading {entityName}...')
-        items = json.loads(await file_util.read_file(filePath=cacheFilePath))
-    else:
-        print(f'querying {entityName}...')
-        items = []
-        while True:
-            dataDict['variables']['skip'] = len(items)
-            response = await requester.post_json(url=url, dataDict=dataDict)
-            data = response.json()
-            items += data['data'][entityName]['items']
-            pageInfo = data['data'][entityName].get('pageInfo')
-            if pageInfo is None:
-                break
-            if pageInfo['count'] < pageInfo['limit']:
-                break
-        await file_util.write_file(filePath=cacheFilePath, content=json.dumps(items, indent=2))
-    return items
-
-
 async def get_asset_by_symbol(requester: Requester, chainId: int, assetSymbol: str) -> Asset:
-    assetDicts = await load_or_query(requester=requester, entityName='assets', cacheEntityName=f'asset-{assetSymbol}', url='https://blue-api.morpho.org/graphql', dataDict={
+    assetDicts = await load_or_query(requester=requester, source='morpho', entityName='assets', cacheEntityName=f'asset-{assetSymbol}', url='https://blue-api.morpho.org/graphql', dataDict={
         'query': morpho_queries.GET_CHAIN_ASSET_QUERY,
         'variables': {
             'chainId': chainId,
@@ -80,7 +53,7 @@ async def get_asset_by_symbol(requester: Requester, chainId: int, assetSymbol: s
 
 
 async def get_asset_by_address(requester: Requester, chainId: int, assetAddress: str) -> Asset:
-    assetDicts = await load_or_query(requester=requester, entityName='assets', cacheEntityName=f'asset-{assetAddress}', url='https://blue-api.morpho.org/graphql', dataDict={
+    assetDicts = await load_or_query(requester=requester, source='morpho', entityName='assets', cacheEntityName=f'asset-{assetAddress}', url='https://blue-api.morpho.org/graphql', dataDict={
         'query': morpho_queries.GET_CHAIN_ASSET_BY_ADDRESS_QUERY,
         'variables': {
             'chainId': chainId,
@@ -94,7 +67,7 @@ async def get_asset_by_address(requester: Requester, chainId: int, assetAddress:
 
 
 async def list_vaults(requester: Requester, chainId: int, assetAddress: str) -> list[Vault]:
-    vaults = await load_or_query(requester=requester, entityName='vaults', cacheEntityName=f'vaults-{assetAddress}', url='https://blue-api.morpho.org/graphql', dataDict={
+    vaults = await load_or_query(requester=requester, source='morpho', entityName='vaults', cacheEntityName=f'vaults-{assetAddress}', url='https://blue-api.morpho.org/graphql', dataDict={
         'query': morpho_queries.LIST_CHAIN_ASSET_VAULTS_QUERY,
         'variables': {
             'chainId': chainId,
