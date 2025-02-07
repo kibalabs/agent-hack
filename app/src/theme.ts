@@ -10,6 +10,7 @@ export const buildHookeTheme = (): ITheme => {
     }),
     header1: {
       'font-weight': '800',
+      color: '$colors.brandPrimary',
     },
     navBarLogo: {
       'font-weight': '800',
@@ -33,7 +34,8 @@ export const buildHookeTheme = (): ITheme => {
   };
   const theme = buildTheme({
     colors: {
-      brandPrimary: '#333',
+      background: '#000',
+      brandPrimary: 'rgb(39, 236, 111)',
       warning: '#cf9f04',
     },
     fonts: {

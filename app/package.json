@@ -6,6 +6,8 @@
     "@kibalabs/core": "^0.6.3-next.1",
     "@kibalabs/core-react": "^0.9.7-next.0",
     "@kibalabs/ui-react": "^0.11.3-next.5",
+    "@kibalabs/web3-react": "^0.2.0",
+    "@kibalabs/ui-react-toast": "0.2.2",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "styled-components": "6.1.14"
