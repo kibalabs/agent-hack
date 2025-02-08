@@ -140,9 +140,10 @@ class AgentManager:
                 'isUser': False,
             },
         ]
+        from core import logging
         from core.util import file_util
-        print('self.sqliteDbPath', self.sqliteDbPath)
-        print('await file_util.file_exists(self.sqliteDbPath)', await file_util.file_exists(self.sqliteDbPath))
+        logging.info('self.sqliteDbPath', self.sqliteDbPath)
+        logging.info('await file_util.file_exists(self.sqliteDbPath)', await file_util.file_exists(self.sqliteDbPath))
         async with AsyncSqliteSaver.from_conn_string(self.sqliteDbPath) as checkpointer:
             latestCheckpoint = await checkpointer.aget(config=config)
             for message in latestCheckpoint.get('channel_values', {}).get('messages', []):
