@@ -16,7 +16,7 @@ async def main():
         cdpApiKeyName=CDP_API_KEY_NAME,
         cdpApiKeyPrivateKey=CDP_API_KEY_PRIVATE_KEY,
         networkId=NETWORK_ID,
-        sqliteDbPath="../data/checkpoints.sqlite",
+        sqliteDbPath="./data/checkpoints.sqlite",
     )
     while True:
         try:

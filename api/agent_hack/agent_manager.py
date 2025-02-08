@@ -56,7 +56,7 @@ class AgentManager:
             "cdp_api_key_private_key": self.cdpApiKeyPrivateKey,
             "network_id": self.networkId,
         }
-        walletDataFilePath = f"../data/walletData-{self.networkId}-{userId}.json"
+        walletDataFilePath = f"./data/walletData-{self.networkId}-{userId}.json"
         if await file_util.file_exists(filePath=walletDataFilePath):
             walletData = await file_util.read_file(filePath=walletDataFilePath)
             values["cdp_wallet_data"] = walletData
