@@ -6,12 +6,12 @@ import { Alignment, ComponentDefinition, Direction, Head, IHeadRootProviderProps
 import { buildToastThemes, Toast, ToastContainer, ToastThemedStyle, useToastManager } from '@kibalabs/ui-react-toast';
 import { Web3AccountControlProvider } from '@kibalabs/web3-react';
 
+import { MatrixBackground } from './components/MatrixBackground';
 import { GlobalsProvider, IGlobals } from './GlobalsContext';
 import { PageDataProvider } from './PageDataContext';
 import { ChatPage } from './pages/ChatPage';
 import { HomePage } from './pages/HomePage';
 import { buildHookeTheme } from './theme';
-
 
 declare global {
   export interface Window {
@@ -64,6 +64,7 @@ export function App(props: IAppProps): React.ReactElement {
             <Head headId='app'>
               <title>Yield Seeker</title>
             </Head>
+            <MatrixBackground />
             <Stack direction={Direction.Vertical} isFullWidth={true} isFullHeight={true} contentAlignment={Alignment.Start} childAlignment={Alignment.Center}>
               <Router staticPath={props.staticPath} routes={routes} />
               <ToastContainer />
