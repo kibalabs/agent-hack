@@ -2,6 +2,7 @@ import base64
 import os
 from typing import Annotated
 
+from core import logging
 from core.exceptions import UnauthorizedException
 from eth_account.messages import encode_defunct
 from fastapi import FastAPI
@@ -17,17 +18,20 @@ CDP_API_KEY_NAME = os.environ["CDP_API_KEY_NAME"]
 CDP_API_KEY_PRIVATE_KEY = os.environ["CDP_API_KEY_PRIVATE_KEY"]
 NETWORK_ID = os.environ["NETWORK_ID"]
 
+logging.basicConfig(level=logging.INFO)
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_credentials=True, allow_methods=['*'], allow_headers=['*'], expose_headers=['*'], allow_origins=[
     'http://localhost:3000',
-], allow_origin_regex='https://.*\\.?(tokenpage.xyz)')
+    'https://demo.yieldseeker.xyz',
+    'https://app.yieldseeker.xyz',
+], allow_origin_regex='https://.*\\.?(yieldseeker.xyz)')
 
 agentManager = AgentManager(
     geminiApiKey=GEMINI_API_KEY,
     cdpApiKeyName=CDP_API_KEY_NAME,
     cdpApiKeyPrivateKey=CDP_API_KEY_PRIVATE_KEY,
     networkId=NETWORK_ID,
-    sqliteDbPath="../data/checkpoints.sqlite",
+    sqliteDbPath="./data/checkpoints.sqlite",
 )
 
 class Message(BaseModel):
