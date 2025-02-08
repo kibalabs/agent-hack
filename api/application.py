@@ -27,7 +27,7 @@ agentManager = AgentManager(
     cdpApiKeyName=CDP_API_KEY_NAME,
     cdpApiKeyPrivateKey=CDP_API_KEY_PRIVATE_KEY,
     networkId=NETWORK_ID,
-    sqliteDbPath="../secrets/checkpoints.sqlite",
+    sqliteDbPath="../data/checkpoints.sqlite",
 )
 
 class Message(BaseModel):

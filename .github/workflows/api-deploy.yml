@@ -1,0 +1,65 @@
+name: deploy
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'api/**'
+      - '.github/workflows/api-deploy.yml'
+  workflow_dispatch:
+jobs:
+  api-deploy:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_IMAGE: ghcr.io/${{ github.repository }}-api:latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Login to GitHub container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Build docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: api
+          push: true
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
+          tags: ${{ env.DOCKER_IMAGE }}
+  api-run:
+    needs: api-deploy
+    runs-on: ubuntu-latest
+    env:
+      NAME: yieldseeker-demo-api
+      VERSION: ${{ github.sha }}
+      DOCKER_IMAGE: ghcr.io/${{ github.repository }}-api:latest
+    steps:
+      - name: executing remote ssh commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.MDTP_BOX_URL }}
+          username: ${{ secrets.MDTP_BOX_USER }}
+          key: ${{ secrets.MDTP_BOX_SSH_KEY }}
+          port: ${{ secrets.MDTP_BOX_PORT }}
+          envs: DOCKER_IMAGE,NAME,VERSION
+          script_stop: true
+          script: |
+            url="demo-api.yieldseeker.xyz"
+            docker pull ${DOCKER_IMAGE}
+            docker stop ${NAME} && docker rm ${NAME} || true
+            docker run \
+              --name ${NAME} \
+              --detach \
+              --publish-all \
+              --restart on-failure \
+              --volume /home/ec2-user/yieldseeker-data:/app/data \
+              --env NAME=${NAME} \
+              --env VERSION=${VERSION} \
+              --env VIRTUAL_HOST=${url} \
+              --env LETSENCRYPT_HOST=${url} \
+              --env-file ~/.${NAME}.vars \
+              ${DOCKER_IMAGE}

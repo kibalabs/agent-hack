@@ -7,7 +7,8 @@ import styled from 'styled-components';
 
 import { ChatMessage } from '../components/ChatMessage';
 import { LoadingIndicator } from '../components/LoadingIndicator';
-import { ChatService, Message } from '../services/ChatService';
+import { useGlobals } from '../GlobalsContext';
+import { Message } from '../services/ChatService';
 
 const StyledSingleLineInput = styled.input`
   background: none;
@@ -52,8 +53,8 @@ export function ChatPage(): React.ReactElement {
   const [inputText, setInputText] = React.useState<string>('');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
-  const chatService = React.useMemo(() => new ChatService(), []);
   const theme = useTheme();
+  const { chatService } = useGlobals();
 
   React.useEffect((): void => {
     if (chainId !== 8453 || account == null || loginSignature == null) {
