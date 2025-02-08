@@ -20,7 +20,7 @@ NETWORK_ID = os.environ["NETWORK_ID"]
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_credentials=True, allow_methods=['*'], allow_headers=['*'], expose_headers=['*'], allow_origins=[
     'http://localhost:3000',
-], allow_origin_regex='https://.*\\.?(tokenpage.xyz)')
+], allow_origin_regex='https://.*\\.?(yieldseeker.xyz)')
 
 agentManager = AgentManager(
     geminiApiKey=GEMINI_API_KEY,
