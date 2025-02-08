@@ -5,8 +5,9 @@ import { Alignment, Direction, Form, IconButton, InputFrame, KibaIcon, PaddingSi
 import { useWeb3Account, useWeb3ChainId } from '@kibalabs/web3-react';
 import styled from 'styled-components';
 
-import { ChatMessage, IChatMessage } from '../components/ChatMessage';
+import { ChatMessage } from '../components/ChatMessage';
 import { LoadingIndicator } from '../components/LoadingIndicator';
+import { ChatService, Message } from '../services/ChatService';
 
 const StyledSingleLineInput = styled.input`
   background: none;
@@ -46,7 +47,7 @@ export function ChatPage(): React.ReactElement {
   const navigator = useNavigator();
   const chainId = useWeb3ChainId();
   const account = useWeb3Account();
-  const [messages, setMessages] = React.useState<IChatMessage[]>([
+  const [messages, setMessages] = React.useState<Message[]>([
     {
       date: new Date(),
       isUser: false,
@@ -58,9 +59,10 @@ export function ChatPage(): React.ReactElement {
       content: 'I\'m here to find you the best yield possible. I\'ll do everything for you but I need to understand your needs first. Let\'s get started by understanding what you\'re looking for in your yield-seeking adventures.',
     },
   ]);
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [inputText, setInputText] = React.useState<string>('');
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const chatService = React.useMemo(() => new ChatService(), []);
 
   React.useEffect((): void => {
     if (chainId !== 8453 || account == null) {
@@ -73,30 +75,33 @@ export function ChatPage(): React.ReactElement {
   }, [messages]);
 
   const onSubmitClicked = async (): Promise<void> => {
-    if (!inputText.trim()) {
+    if (!inputText.trim() || !account) {
       return;
     }
 
     setIsLoading(true);
-    const userMessage: IChatMessage = {
-      date: new Date(),
+    const userMessage: Message = {
+      content: inputText.trim(),
       isUser: true,
-      content: inputText,
+      date: new Date(),
     };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     setInputText('');
 
-    // TODO: Add API call here
-    // Simulate AI response for now
-    setTimeout(() => {
-      const aiMessage: IChatMessage = {
-        date: new Date(),
+    try {
+      const response = await chatService.sendMessage(userMessage.content, account.address);
+      setMessages((prevMessages) => [...prevMessages, response]);
+    } catch (error) {
+      console.error('Failed to get AI response:', error);
+      const errorMessage: Message = {
+        content: 'Sorry, something went wrong. Please try again.',
         isUser: false,
-        content: 'This is a simulated AI response. The actual API integration will be added later.',
+        date: new Date(),
       };
-      setMessages((prevMessages) => [...prevMessages, aiMessage]);
+      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 700);
+    }
   };
 
   const theme = useTheme();
@@ -106,7 +111,7 @@ export function ChatPage(): React.ReactElement {
       <Stack.Item growthFactor={1} shrinkFactor={1} shouldShrinkBelowContentSize={true} alignment={Alignment.Center}>
         <Stack isFullHeight={true} isFullWidth={true} isScrollableVertically={true} childAlignment={Alignment.Center}>
           <Stack direction={Direction.Vertical} shouldAddGutters={true} paddingVertical={PaddingSize.Wide} contentAlignment={Alignment.End} width='min(95%, 750px)' defaultGutter={PaddingSize.Wide}>
-            {messages.map((message: IChatMessage): React.ReactElement => (
+            {messages.map((message: Message): React.ReactElement => (
               <ChatMessage key={message.date.toISOString()} message={message} />
             ))}
             {isLoading && (

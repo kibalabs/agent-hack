@@ -208,6 +208,17 @@ export const buildHookeTheme = (): ITheme => {
         position: 'sticky',
         top: '0',
       },
+      chatMessage: {
+        padding: '1em 1.5em',
+      },
+      chatMessageUser: {
+        'background-color': '$colors.backgroundLight10',
+        'border-radius': '0.99em 0.99em 0 0.99em',
+        'align-self': 'flex-end',
+      },
+      chatMessageBot: {
+        'background-color': 'transparent',
+      },
     },
     listItems: {
       card: {
