@@ -20,7 +20,7 @@ async def load_or_query(
         cacheEntityName = entityName
     cacheFilePath = f'../secrets/{source}-{cacheEntityName}.json'
     fileExists = await file_util.file_exists(filePath=cacheFilePath)
-    fileAgeMillis = await file_util.get_file_age_millis(filePath=cacheFilePath)
+    fileAgeMillis = await file_util.get_file_age_millis(filePath=cacheFilePath) if fileExists else 0
     if fileExists and (fileAgeMillis / 1000) < expirySeconds:
         logging.info(f'loading {cacheEntityName}...')
         items = json.loads(await file_util.read_file(filePath=cacheFilePath))

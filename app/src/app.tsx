@@ -2,7 +2,7 @@ import React from 'react';
 
 import { LocalStorageClient, Requester } from '@kibalabs/core';
 import { IRoute, MockStorage, Router } from '@kibalabs/core-react';
-import { Alignment, ComponentDefinition, Direction, Head, IHeadRootProviderProps, KibaApp, Stack } from '@kibalabs/ui-react';
+import { Alignment, Box, ComponentDefinition, Direction, IHeadRootProviderProps, KibaApp, Stack } from '@kibalabs/ui-react';
 import { buildToastThemes, Toast, ToastContainer, ToastThemedStyle, useToastManager } from '@kibalabs/ui-react-toast';
 import { Web3AccountControlProvider } from '@kibalabs/web3-react';
 
@@ -61,14 +61,13 @@ export function App(props: IAppProps): React.ReactElement {
         <GlobalsProvider globals={globals}>
           {/* @ts-expect-error */}
           <Web3AccountControlProvider localStorageClient={localStorageClient} onError={onWeb3AccountError}>
-            <Head headId='app'>
-              <title>Yield Seeker</title>
-            </Head>
             <MatrixBackground />
-            <Stack direction={Direction.Vertical} isFullWidth={true} isFullHeight={true} contentAlignment={Alignment.Start} childAlignment={Alignment.Center}>
-              <Router staticPath={props.staticPath} routes={routes} />
-              <ToastContainer />
-            </Stack>
+            <Box zIndex={1} position={'absolute'} isFullWidth={true} isFullHeight={true}>
+              <Stack direction={Direction.Vertical} isFullWidth={true} isFullHeight={true} contentAlignment={Alignment.Start} childAlignment={Alignment.Center}>
+                <Router staticPath={props.staticPath} routes={routes} />
+                <ToastContainer />
+              </Stack>
+            </Box>
           </Web3AccountControlProvider>
         </GlobalsProvider>
       </PageDataProvider>

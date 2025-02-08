@@ -13,22 +13,22 @@ This tool will list vaults for achieving yield that are hosted on the Morpho pro
 Each yield will come with details about its APY and rewards.
 """
 
-class MorphoListVaultsInput(BaseModel):
+class ListAllYieldOptionsInput(BaseModel):
     pass
 
-async def morpho_list_vaults(wallet: Wallet) -> str:
+async def list_all_yield_options(wallet: Wallet) -> str:
     if wallet.network_id == 'base-mainnet':
         chainId = yield_options.BASE_CHAIN_ID
     else:
         raise KibaException('Unsupported network, only base is supported')
-    yieldOptions = await yield_options.list_morpho_yield_options(chainId=chainId)
+    yieldOptions = await yield_options.list_all_yield_options(chainId=chainId)
     yieldOptionJsons = [yieldOption.model_dump_json() for yieldOption in yieldOptions]
     output = f'Available vaults are here in a json list: {yieldOptionJsons}'
     return output
 
 
-class MorphoListVaultsAction(BaseAction):
-    name: str = "morpho_list_vaults"
+class ListAllYieldOptionsAction(BaseAction):
+    name: str = "list_all_yield_options"
     description: str = PROMPT
-    args_schema: type[BaseModel] | None = MorphoListVaultsInput
-    afunc: Callable[..., str] = morpho_list_vaults
+    args_schema: type[BaseModel] | None = ListAllYieldOptionsInput
+    afunc: Callable[..., str] = list_all_yield_options

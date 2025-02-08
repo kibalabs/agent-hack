@@ -23,9 +23,11 @@ from langgraph.prebuilt import create_react_agent
 
 from agent_hack.kiba_cdp_agentkit_wrapper import KibaCdpAgentkitWrapper
 from agent_hack.kiba_cdp_tool import KibaCdpTool
+from agent_hack.list_all_yield_options import ListAllYieldOptionsAction
 from agent_hack.morpho_deposit_action import MorphoDepositAction
 from agent_hack.morpho_list_vaults_action import MorphoListVaultsAction
 from agent_hack.sign_message_action import SignMessageAction
+from agent_hack.spark_get_yield_action import GetSparkYieldAction
 
 
 class AgentManager:
@@ -74,6 +76,8 @@ class AgentManager:
             WrapEthAction(),
             SignMessageAction(),
             MorphoListVaultsAction(),
+            GetSparkYieldAction(),
+            ListAllYieldOptionsAction(),
         ]
         tools = [
             KibaCdpTool.from_cdp_action(
