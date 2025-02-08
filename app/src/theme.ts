@@ -1,4 +1,4 @@
-import { buildTheme, ICheckboxTheme, IIconButtonTheme, ITextTheme, ITheme, mergeTheme, mergeThemePartial, ThemeMap } from '@kibalabs/ui-react';
+import { buildTheme, ICheckboxTheme, ITextTheme, ITheme, mergeTheme, mergeThemePartial, ThemeMap } from '@kibalabs/ui-react';
 
 export const buildHookeTheme = (): ITheme => {
   const baseTheme = buildTheme();
@@ -120,11 +120,21 @@ export const buildHookeTheme = (): ITheme => {
     },
     iconButtons: {
       default: {
+        normal: {
+          default: {
+            background: {
+              'border-width': 0,
+            },
+          },
+        },
+      },
+      primary: {
         disabled: {
           default: {
             background: {
-              'background-color': (baseTheme.iconButtons as ThemeMap<IIconButtonTheme>).default.normal?.default.background['background-color'],
-              opacity: '0.2',
+              'background-color': '$colors.backgroundLight10',
+              'border-width': 0,
+            // opacity: '0.2',
             },
           },
         },
@@ -134,6 +144,15 @@ export const buildHookeTheme = (): ITheme => {
           default: {
             text: {
               color: '$colors.textClear50',
+            },
+          },
+        },
+      },
+      large: {
+        normal: {
+          default: {
+            background: {
+              padding: `${baseTheme.dimensions.paddingWide} ${baseTheme.dimensions.paddingWide}`,
             },
           },
         },
@@ -149,7 +168,8 @@ export const buildHookeTheme = (): ITheme => {
               'caret-color': '$colors.brandPrimary',
               'caret-width': '0.5em',
               'border-color': '$colors.textClear80',
-              'padding': `${baseTheme.dimensions.paddingWide} ${baseTheme.dimensions.paddingWide2}`,
+              // 'padding': `${baseTheme.dimensions.paddingWide} ${baseTheme.dimensions.paddingWide2}`,
+              padding: '0',
             },
           },
           focus: {

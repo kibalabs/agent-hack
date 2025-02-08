@@ -1,18 +1,65 @@
 import React from 'react';
 
 import { useNavigator } from '@kibalabs/core-react';
-import { Alignment, Direction, PaddingSize, SingleLineInput, Spacing, Stack, Text } from '@kibalabs/ui-react';
+import { Alignment, Direction, Form, IconButton, InputFrame, KibaIcon, PaddingSize, Spacing, Stack, useTheme } from '@kibalabs/ui-react';
 import { useWeb3Account, useWeb3ChainId } from '@kibalabs/web3-react';
+import styled from 'styled-components';
 
-import { ChatMessage } from '../components/ChatMessage';
+import { ChatMessage, IChatMessage } from '../components/ChatMessage';
+import { LoadingIndicator } from '../components/LoadingIndicator';
+
+const StyledSingleLineInput = styled.input`
+  background: none;
+  border: none;
+  outline: none;
+  cursor: text;
+  overflow: hidden;
+  white-space: nowrap;
+  box-shadow: none;
+
+  &:hover {
+    box-shadow: none;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &.disabled {
+    pointer-events: none;
+  }
+
+  &.hideSpinButtons {
+    &[type='number'] {
+      -moz-appearance: textfield;
+    }
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+`;
 
 export function ChatPage(): React.ReactElement {
   const navigator = useNavigator();
   const chainId = useWeb3ChainId();
   const account = useWeb3Account();
-  const [messages, setMessages] = React.useState<Record<string, any>[]>([]);
+  const [messages, setMessages] = React.useState<IChatMessage[]>([
+    {
+      date: new Date(),
+      isUser: false,
+      content: 'Welcome, Wallet Holder!',
+    },
+    {
+      date: new Date(),
+      isUser: false,
+      content: 'I\'m here to find you the best yield possible. I\'ll do everything for you but I need to understand your needs first. Let\'s get started by understanding what you\'re looking for in your yield-seeking adventures.',
+    },
+  ]);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [input, setInput] = React.useState<string>('');
+  const [inputText, setInputText] = React.useState<string>('');
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect((): void => {
@@ -25,60 +72,82 @@ export function ChatPage(): React.ReactElement {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // const onMessageSubmitted = async (message: string): Promise<void> => {
-  //   setIsLoading(true);
-  //   // Add user message
-  //   const userMessage: IChatMessage = {
-  //     isUser: true,
-  //     content: message,
-  //   };
-  //   setMessages((prevMessages) => [...prevMessages, userMessage]);
+  const onSubmitClicked = async (): Promise<void> => {
+    if (!inputText.trim()) {
+      return;
+    }
 
-  //   // TODO: Add API call here
-  //   // Simulate AI response for now
-  //   setTimeout(() => {
-  //     const aiMessage: IChatMessage = {
-  //       isUser: false,
-  //       content: 'This is a simulated AI response. The actual API integration will be added later.',
-  //     };
-  //     setMessages((prevMessages) => [...prevMessages, aiMessage]);
-  //     setIsLoading(false);
-  //   }, 1000);
-  // };
+    setIsLoading(true);
+    const userMessage: IChatMessage = {
+      date: new Date(),
+      isUser: true,
+      content: inputText,
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setInputText('');
+
+    // TODO: Add API call here
+    // Simulate AI response for now
+    setTimeout(() => {
+      const aiMessage: IChatMessage = {
+        date: new Date(),
+        isUser: false,
+        content: 'This is a simulated AI response. The actual API integration will be added later.',
+      };
+      setMessages((prevMessages) => [...prevMessages, aiMessage]);
+      setIsLoading(false);
+    }, 700);
+  };
+
+  const theme = useTheme();
 
   return (
-    <Stack direction={Direction.Vertical} isFullHeight={true} isFullWidth={true}>
-      <Stack.Item growthFactor={1} shrinkFactor={1} shouldShrinkBelowContentSize={true}>
-        <Stack direction={Direction.Vertical} shouldAddGutters={false} paddingVertical={PaddingSize.Wide} contentAlignment={Alignment.End} isFullHeight={true} isFullWidth={true}>
-          {messages.length > 0 ? (
-            <React.Fragment>
-              {messages.map((message, index) => (
-                <ChatMessage message={message} />
-              ))}
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-              <Stack.Item alignment={Alignment.Center}>
-                <Text variant='header2'>Welcome, Wallet Holder</Text>
-              </Stack.Item>
-              <Spacing variant={PaddingSize.Wide3} />
-              <Stack.Item alignment={Alignment.Center}>
-                <ChatMessage isUser={false} content="I'm here to find you the best yield possible. I'll do everything for you but I need to understand your needs first. Let's get started by understanding what you're looking for in your yield-seeking adventures." />
-              </Stack.Item>
-              <Spacing variant={PaddingSize.Wide4} />
-            </React.Fragment>
-          )}
-          <div ref={messagesEndRef} />
+    <Stack direction={Direction.Vertical} isFullHeight={true} isFullWidth={true} maxWidth='1500px'>
+      <Stack.Item growthFactor={1} shrinkFactor={1} shouldShrinkBelowContentSize={true} alignment={Alignment.Center}>
+        <Stack isFullHeight={true} isFullWidth={true} isScrollableVertically={true} childAlignment={Alignment.Center}>
+          <Stack direction={Direction.Vertical} shouldAddGutters={true} paddingVertical={PaddingSize.Wide} contentAlignment={Alignment.End} width='min(95%, 750px)' defaultGutter={PaddingSize.Wide}>
+            {messages.map((message: IChatMessage): React.ReactElement => (
+              <ChatMessage key={message.date.toISOString()} message={message} />
+            ))}
+            {isLoading && (
+              <Stack direction={Direction.Horizontal} childAlignment={Alignment.Start} contentAlignment={Alignment.Start} paddingHorizontal={PaddingSize.Wide}>
+                <LoadingIndicator />
+              </Stack>
+            )}
+            <div ref={messagesEndRef} />
+          </Stack>
         </Stack>
       </Stack.Item>
-      <SingleLineInput
-        inputWrapperVariant='chatInput'
-        isEnabled={!isLoading}
-        value={input}
-        onValueChanged={setInput}
-        shouldAutofocus={true}
-        placeholderText='Ask Yield Seeker...'
-      />
+      <Form onFormSubmitted={onSubmitClicked}>
+        <InputFrame
+          theme={theme?.TextFrameTheme}
+          inputWrapperVariant='chatInput'
+          isEnabled={!isLoading}
+        >
+          <Stack direction={Direction.Horizontal} childAlignment={Alignment.Center} shouldAddGutters={true}>
+            <Spacing variant={PaddingSize.Wide} />
+            <Stack.Item growthFactor={1} shrinkFactor={1} shouldShrinkBelowContentSize={true}>
+              <StyledSingleLineInput
+                type='text'
+                autoComplete='on'
+                value={inputText}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>): void => setInputText(event.target.value)}
+                aria-label='input'
+                placeholder='Ask Yield Seeker...'
+                autoFocus={true}
+                spellCheck={true}
+                disabled={isLoading}
+              />
+            </Stack.Item>
+            <IconButton
+              variant='primary-large'
+              icon={<KibaIcon iconId='ion-send' />}
+              buttonType='submit'
+              isEnabled={inputText.length > 0 && !isLoading}
+            />
+          </Stack>
+        </InputFrame>
+      </Form>
     </Stack>
   );
 }

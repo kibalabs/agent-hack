@@ -64,7 +64,7 @@ export function App(props: IAppProps): React.ReactElement {
             <Head headId='app'>
               <title>Yield Seeker</title>
             </Head>
-            <Stack direction={Direction.Vertical} isFullWidth={true} isFullHeight={true} contentAlignment={Alignment.Start}>
+            <Stack direction={Direction.Vertical} isFullWidth={true} isFullHeight={true} contentAlignment={Alignment.Start} childAlignment={Alignment.Center}>
               <Router staticPath={props.staticPath} routes={routes} />
               <ToastContainer />
             </Stack>
