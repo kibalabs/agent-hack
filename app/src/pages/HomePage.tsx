@@ -2,22 +2,31 @@ import React from 'react';
 
 import { useNavigator } from '@kibalabs/core-react';
 import { Alignment, Button, Direction, PaddingSize, Spacing, Stack, Text } from '@kibalabs/ui-react';
-import { useOnLinkWeb3AccountsClicked, useWeb3Account, useWeb3ChainId } from '@kibalabs/web3-react';
+import { useOnLinkWeb3AccountsClicked, useWeb3Account, useWeb3ChainId, useWeb3LoginSignature, useWeb3OnLoginClicked } from '@kibalabs/web3-react';
 
 export function HomePage(): React.ReactElement {
   const navigator = useNavigator();
   const chainId = useWeb3ChainId();
   const account = useWeb3Account();
   const onLinkAccountsClicked = useOnLinkWeb3AccountsClicked();
+  const onAccountLoginClicked = useWeb3OnLoginClicked();
+  const loginSignature = useWeb3LoginSignature();
+  const [isLoggingIn, setIsLoggingIn] = React.useState<boolean>(false);
 
   React.useEffect((): void => {
-    if (chainId === 8453 && account != null) {
+    if (chainId === 8453 && account && loginSignature) {
       navigator.navigateTo('/chat');
     }
-  }, [chainId, account, navigator]);
+  }, [chainId, account, navigator, loginSignature]);
 
   const onConnectWalletClicked = async () => {
     await onLinkAccountsClicked();
+  };
+
+  const onLoginClicked = async (): Promise<void> => {
+    setIsLoggingIn(true);
+    await onAccountLoginClicked();
+    setIsLoggingIn(false);
   };
 
   const onSwitchToBaseClicked = async () => {
@@ -50,12 +59,12 @@ export function HomePage(): React.ReactElement {
             onClicked={onSwitchToBaseClicked}
           />
         </React.Fragment>
+      ) : isLoggingIn ? (
+        <Text>Please check your wallet to sign the login message</Text>
+      ) : !loginSignature ? (
+        <Button variant='primary-large' text='Log in' onClicked={onLoginClicked} isLoading={isLoggingIn} />
       ) : (
-        <Text variant='large'>
-          Connected to
-          {' '}
-          {account.address}
-        </Text>
+        <Text variant='large'>{`Connected to ${account.address}`}</Text>
       )}
     </Stack>
   );

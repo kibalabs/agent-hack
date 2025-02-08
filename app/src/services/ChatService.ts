@@ -3,18 +3,21 @@ export interface Message {
   isUser: boolean;
 }
 
-export interface ChatSession {
+export interface ChatHistory {
   messages: Message[];
-  userId: string;
 }
 
 export interface ChatRequest {
   content: string;
-  userId: string;
 }
 
 export interface ChatResponse {
   message: Message;
+}
+
+export interface AuthToken {
+  message: string;
+  signature: string;
 }
 
 export class ChatService {
@@ -24,16 +27,21 @@ export class ChatService {
     this.baseUrl = baseUrl;
   }
 
-  public async sendMessage(content: string, userId: string): Promise<Message> {
+  // eslint-disable-next-line class-methods-use-this, no-undef
+  private getHeaders(authToken: AuthToken): HeadersInit {
+    return {
+      'Content-Type': 'application/json',
+      Authorization: btoa(JSON.stringify(authToken)),
+    };
+  }
+
+  public async sendMessage(content: string, userId: string, authToken: AuthToken): Promise<Message> {
     const request: ChatRequest = {
       content,
-      userId,
     };
-    const response = await fetch(`${this.baseUrl}/chat`, {
+    const response = await fetch(`${this.baseUrl}/chats/${userId}/messages`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: this.getHeaders(authToken),
       body: JSON.stringify(request),
     });
     if (!response.ok) {
@@ -43,13 +51,16 @@ export class ChatService {
     return data.message;
   }
 
-  public async getChatHistory(userId: string): Promise<ChatSession> {
-    const url = new URL(`${this.baseUrl}/chat/${userId}`);
-    const response = await fetch(url.toString());
+  public async getChatHistory(userId: string, authToken: AuthToken): Promise<ChatHistory> {
+    const url = new URL(`${this.baseUrl}/chats/${userId}/history`);
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: this.getHeaders(authToken),
+    });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const data: ChatSession = await response.json();
+    const data: ChatHistory = await response.json();
     return data;
   }
 }

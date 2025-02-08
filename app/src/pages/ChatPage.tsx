@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useNavigator } from '@kibalabs/core-react';
 import { Alignment, Direction, Form, IconButton, InputFrame, KibaIcon, PaddingSize, Spacing, Stack, useTheme } from '@kibalabs/ui-react';
-import { useWeb3Account, useWeb3ChainId } from '@kibalabs/web3-react';
+import { useWeb3Account, useWeb3ChainId, useWeb3LoginSignature } from '@kibalabs/web3-react';
 import styled from 'styled-components';
 
 import { ChatMessage } from '../components/ChatMessage';
@@ -47,6 +47,7 @@ export function ChatPage(): React.ReactElement {
   const navigator = useNavigator();
   const chainId = useWeb3ChainId();
   const account = useWeb3Account();
+  const loginSignature = useWeb3LoginSignature();
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [inputText, setInputText] = React.useState<string>('');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -55,10 +56,10 @@ export function ChatPage(): React.ReactElement {
   const theme = useTheme();
 
   React.useEffect((): void => {
-    if (chainId !== 8453 || account == null) {
+    if (chainId !== 8453 || account == null || loginSignature == null) {
       navigator.navigateTo('/');
     }
-  }, [chainId, account, navigator]);
+  }, [chainId, account, navigator, loginSignature]);
 
   React.useEffect((): void => {
     if (messagesEndRef.current) {
@@ -68,11 +69,11 @@ export function ChatPage(): React.ReactElement {
 
   React.useEffect((): void => {
     const loadChatHistory = async (): Promise<void> => {
-      if (!account?.address) {
+      if (!account?.address || !loginSignature) {
         return;
       }
       try {
-        const history = await chatService.getChatHistory(account.address);
+        const history = await chatService.getChatHistory(account.address, loginSignature);
         setMessages(history.messages);
       } catch (error) {
         console.error('Failed to load chat history:', error);
@@ -80,13 +81,12 @@ export function ChatPage(): React.ReactElement {
     };
 
     loadChatHistory();
-  }, [account?.address, chatService]);
+  }, [account?.address, chatService, loginSignature]);
 
   const onSubmitClicked = async (): Promise<void> => {
-    if (!inputText.trim() || !account) {
+    if (!inputText.trim() || !account || !loginSignature) {
       return;
     }
-
     setIsLoading(true);
     const userMessage: Message = {
       content: inputText.trim(),
@@ -94,9 +94,8 @@ export function ChatPage(): React.ReactElement {
     };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     setInputText('');
-
     try {
-      const response = await chatService.sendMessage(userMessage.content, account.address);
+      const response = await chatService.sendMessage(userMessage.content, account.address, loginSignature);
       setMessages((prevMessages) => [...prevMessages, response]);
     } catch (error) {
       console.error('Failed to get AI response:', error);
