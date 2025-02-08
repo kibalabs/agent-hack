@@ -2,6 +2,7 @@ import base64
 import os
 from typing import Annotated
 
+from core import logging
 from core.exceptions import UnauthorizedException
 from eth_account.messages import encode_defunct
 from fastapi import FastAPI
@@ -17,6 +18,7 @@ CDP_API_KEY_NAME = os.environ["CDP_API_KEY_NAME"]
 CDP_API_KEY_PRIVATE_KEY = os.environ["CDP_API_KEY_PRIVATE_KEY"]
 NETWORK_ID = os.environ["NETWORK_ID"]
 
+logging.basicConfig(level=logging.INFO)
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_credentials=True, allow_methods=['*'], allow_headers=['*'], expose_headers=['*'], allow_origins=[
     'http://localhost:3000',
