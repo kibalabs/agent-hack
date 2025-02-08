@@ -1,11 +1,9 @@
 export interface Message {
   content: string;
   isUser: boolean;
-  date: Date;
 }
 
 export interface ChatSession {
-  id: string;
   messages: Message[];
   userId: string;
 }
@@ -42,9 +40,16 @@ export class ChatService {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data: ChatResponse = await response.json();
-    return {
-      ...data.message,
-      date: new Date(data.message.date),
-    };
+    return data.message;
+  }
+
+  public async getChatHistory(userId: string): Promise<ChatSession> {
+    const url = new URL(`${this.baseUrl}/chat/${userId}`);
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data: ChatSession = await response.json();
+    return data;
   }
 }

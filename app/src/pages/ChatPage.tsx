@@ -47,22 +47,12 @@ export function ChatPage(): React.ReactElement {
   const navigator = useNavigator();
   const chainId = useWeb3ChainId();
   const account = useWeb3Account();
-  const [messages, setMessages] = React.useState<Message[]>([
-    {
-      date: new Date(),
-      isUser: false,
-      content: 'Welcome, Wallet Holder!',
-    },
-    {
-      date: new Date(),
-      isUser: false,
-      content: 'I\'m here to find you the best yield possible. I\'ll do everything for you but I need to understand your needs first. Let\'s get started by understanding what you\'re looking for in your yield-seeking adventures.',
-    },
-  ]);
+  const [messages, setMessages] = React.useState<Message[]>([]);
   const [inputText, setInputText] = React.useState<string>('');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const chatService = React.useMemo(() => new ChatService(), []);
+  const theme = useTheme();
 
   React.useEffect((): void => {
     if (chainId !== 8453 || account == null) {
@@ -71,8 +61,26 @@ export function ChatPage(): React.ReactElement {
   }, [chainId, account, navigator]);
 
   React.useEffect((): void => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages]);
+
+  React.useEffect((): void => {
+    const loadChatHistory = async (): Promise<void> => {
+      if (!account?.address) {
+        return;
+      }
+      try {
+        const history = await chatService.getChatHistory(account.address);
+        setMessages(history.messages);
+      } catch (error) {
+        console.error('Failed to load chat history:', error);
+      }
+    };
+
+    loadChatHistory();
+  }, [account?.address, chatService]);
 
   const onSubmitClicked = async (): Promise<void> => {
     if (!inputText.trim() || !account) {
@@ -83,7 +91,6 @@ export function ChatPage(): React.ReactElement {
     const userMessage: Message = {
       content: inputText.trim(),
       isUser: true,
-      date: new Date(),
     };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     setInputText('');
@@ -96,7 +103,6 @@ export function ChatPage(): React.ReactElement {
       const errorMessage: Message = {
         content: 'Sorry, something went wrong. Please try again.',
         isUser: false,
-        date: new Date(),
       };
       setMessages((prevMessages) => [...prevMessages, errorMessage]);
     } finally {
@@ -104,15 +110,13 @@ export function ChatPage(): React.ReactElement {
     }
   };
 
-  const theme = useTheme();
-
   return (
     <Stack direction={Direction.Vertical} isFullHeight={true} isFullWidth={true} maxWidth='1500px'>
       <Stack.Item growthFactor={1} shrinkFactor={1} shouldShrinkBelowContentSize={true} alignment={Alignment.Center}>
         <Stack isFullHeight={true} isFullWidth={true} isScrollableVertically={true} childAlignment={Alignment.Center}>
           <Stack direction={Direction.Vertical} shouldAddGutters={true} paddingVertical={PaddingSize.Wide} contentAlignment={Alignment.End} width='min(95%, 750px)' defaultGutter={PaddingSize.Wide}>
             {messages.map((message: Message): React.ReactElement => (
-              <ChatMessage key={message.date.toISOString()} message={message} />
+              <ChatMessage key={message.content} message={message} />
             ))}
             {isLoading && (
               <Stack direction={Direction.Horizontal} childAlignment={Alignment.Start} contentAlignment={Alignment.Start} paddingHorizontal={PaddingSize.Wide}>

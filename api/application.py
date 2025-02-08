@@ -1,4 +1,3 @@
-import datetime
 import os
 from typing import List
 
@@ -29,10 +28,8 @@ agentManager = AgentManager(
 class Message(BaseModel):
     content: str
     isUser: bool
-    date: datetime.datetime
 
 class ChatSession(BaseModel):
-    id: str
     messages: List[Message]
     userId: str
 
@@ -46,15 +43,16 @@ class ChatResponse(BaseModel):
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
-    userMessage = Message(content=request.content, isUser=True, date=datetime.datetime.now())
+    userMessage = Message(content=request.content, isUser=True)
     agentResponse = await agentManager.get_agent_response(userId=request.userId, message=userMessage.content)
-    agentMessage = Message(content=agentResponse, isUser=False, date=datetime.datetime.now())
+    agentMessage = Message(content=agentResponse, isUser=False)
     return ChatResponse(message=agentMessage)
 
 
-# @app.get("/chat/{sessionId}", response_model=ChatSession)
-# async def get_chat_session(sessionId: str):
-#     return None
-#     if sessionId not in chat_sessions:
-#         raise HTTPException(status_code=404, detail="Chat session not found")
-#     return chat_sessions[sessionId]
+@app.get("/chat/{userId}", response_model=ChatSession)
+async def get_chat_history(userId: str):
+    messages = await agentManager.get_chat_history(userId=userId)
+    return ChatSession(
+        userId=userId,
+        messages=[Message.model_validate(message) for message in messages],
+    )

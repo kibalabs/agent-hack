@@ -1,9 +1,13 @@
 import contextlib
+from typing import Any
 from typing import AsyncIterator
+from typing import Dict
+from typing import List
 
 from cdp_agentkit_core.actions import CDP_ACTIONS
 from core.util import file_util
 from langchain.agents import AgentExecutor
+from langchain_core.messages import AIMessage
 from langchain_core.messages import HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
@@ -97,3 +101,29 @@ class AgentManager:
                 if "agent" in chunk:
                     agentResponse += chunk["agent"]["messages"][0].content
         return agentResponse
+
+    async def get_chat_history(self, userId: str, sessionId: str | None = None) -> List[Dict[str, Any]]:
+        config = {
+            "configurable": {
+                "thread_id": f'{userId}-{sessionId}',
+            },
+        }
+        messages = [
+            {
+                'content': 'Welcome, Wallet Holder!',
+                'isUser': False,
+            },
+            {
+                'content': 'I\'m here to find you the best yield possible. I\'ll do everything for you but I need to understand your needs first. Let\'s get started by understanding what you\'re looking for in your yield-seeking adventures.',
+                'isUser': False,
+            },
+        ]
+        async with AsyncSqliteSaver.from_conn_string(self.sqliteDbPath) as checkpointer:
+            latestCheckpoint = await checkpointer.aget(config=config)
+            for message in latestCheckpoint.get('channel_values', {}).get('messages', []):
+                if isinstance(message, (HumanMessage, AIMessage)):
+                    messages.append({
+                        "content": message.content,
+                        "isUser": isinstance(message, HumanMessage),
+                    })
+        return messages
