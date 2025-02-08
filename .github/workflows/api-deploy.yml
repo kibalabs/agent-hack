@@ -41,10 +41,10 @@ jobs:
       - name: executing remote ssh commands
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.MDTP_BOX_URL }}
-          username: ${{ secrets.MDTP_BOX_USER }}
-          key: ${{ secrets.MDTP_BOX_SSH_KEY }}
-          port: ${{ secrets.MDTP_BOX_PORT }}
+          host: ${{ secrets.MDTPBOX_URL }}
+          username: ${{ secrets.MDTPBOX_USER }}
+          key: ${{ secrets.MDTPBOX_SSH_KEY }}
+          port: ${{ secrets.MDTPBOX_PORT }}
           envs: DOCKER_IMAGE,NAME,VERSION
           script_stop: true
           script: |
