@@ -142,10 +142,11 @@ class AgentManager:
         ]
         async with AsyncSqliteSaver.from_conn_string(self.sqliteDbPath) as checkpointer:
             latestCheckpoint = await checkpointer.aget(config=config)
-            for message in latestCheckpoint.get('channel_values', {}).get('messages', []):
-                if isinstance(message, (HumanMessage, AIMessage)):
-                    messages.append({
-                        "content": message.content,
-                        "isUser": isinstance(message, HumanMessage),
-                    })
+            if latestCheckpoint is not None:
+                for message in latestCheckpoint.get('channel_values', {}).get('messages', []):
+                    if isinstance(message, (HumanMessage, AIMessage)):
+                        messages.append({
+                            "content": message.content,
+                            "isUser": isinstance(message, HumanMessage),
+                        })
         return messages

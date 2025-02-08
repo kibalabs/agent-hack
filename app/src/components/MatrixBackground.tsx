@@ -8,7 +8,7 @@ const fallAnimation = keyframes`
     opacity: 0;
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.15;
   }
   100% {
     transform: translateY(100vh);
@@ -31,7 +31,7 @@ const Column = styled.div<{ delay: number; duration: number; left: number }>`
   position: absolute;
   top: 0;
   left: ${(props) => props.left}%;
-  color: rgba(0, 255, 0, 0.1);
+  color: rgba(0, 255, 0, 1);
   font-family: monospace;
   font-size: 1.2em;
   line-height: 1.5em;
@@ -74,7 +74,7 @@ export function MatrixBackground(): React.ReactElement {
     .map((_, index) => ({
       chars: generateRandomString(20),
       delay: Math.random() * 2,
-      duration: 15 + Math.random() * 20, // Slower animation
+      duration: 15 + Math.random() * 20,
       left: (index * 100) / columnCount,
     }));
 
