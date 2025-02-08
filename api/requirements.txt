@@ -1,5 +1,4 @@
 cdp-langchain==0.0.13
 langchain-google-genai==2.0.9
 langgraph-checkpoint-sqlite==2.0.3
--e /Users/krishan/Projects/core-py[requester,api,storage,web3]
-# kiba-core[requester, api, storage]==0.5.3.dev6
+kiba-core[requester, api, storage, web3]==0.5.3.dev7

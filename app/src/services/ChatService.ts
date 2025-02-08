@@ -23,7 +23,7 @@ export interface AuthToken {
 export class ChatService {
   private readonly baseUrl: string;
 
-  public constructor(baseUrl: string = 'http://localhost:5000') {
+  public constructor(baseUrl: string = 'https://demo-api.yieldseeker.xyz') {
     this.baseUrl = baseUrl;
   }
 

@@ -1,4 +1,4 @@
-FROM python:3.10.15-slim
+FROM python:3.10.15
 
 RUN apt-get update && apt-get install --yes --no-install-recommends make
 

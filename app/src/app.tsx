@@ -11,6 +11,7 @@ import { GlobalsProvider, IGlobals } from './GlobalsContext';
 import { PageDataProvider } from './PageDataContext';
 import { ChatPage } from './pages/ChatPage';
 import { HomePage } from './pages/HomePage';
+import { ChatService } from './services/ChatService';
 import { buildHookeTheme } from './theme';
 
 declare global {
@@ -20,7 +21,8 @@ declare global {
 }
 
 const requester = new Requester();
-// const baseUrl = typeof window !== 'undefined' && window.KRT_API_URL ? window.KRT_API_URL : 'https://api.yieldseeker.xyz';
+const baseUrl = typeof window !== 'undefined' && window.KRT_API_URL ? window.KRT_API_URL : 'https://api.yieldseeker.xyz';
+const chatService = new ChatService(baseUrl);
 const localStorageClient = new LocalStorageClient(typeof window !== 'undefined' ? window.localStorage : new MockStorage());
 const sessionStorageClient = new LocalStorageClient(typeof window !== 'undefined' ? window.sessionStorage : new MockStorage());
 const theme = buildHookeTheme();
@@ -29,6 +31,7 @@ export const globals: IGlobals = {
   requester,
   localStorageClient,
   sessionStorageClient,
+  chatService,
 };
 
 export const routes: IRoute<IGlobals>[] = [
@@ -62,7 +65,7 @@ export function App(props: IAppProps): React.ReactElement {
           {/* @ts-expect-error */}
           <Web3AccountControlProvider localStorageClient={localStorageClient} onError={onWeb3AccountError}>
             <MatrixBackground />
-            <Box zIndex={1} position={'absolute'} isFullWidth={true} isFullHeight={true}>
+            <Box zIndex={1} position='absolute' isFullWidth={true} isFullHeight={true}>
               <Stack direction={Direction.Vertical} isFullWidth={true} isFullHeight={true} contentAlignment={Alignment.Start} childAlignment={Alignment.Center}>
                 <Router staticPath={props.staticPath} routes={routes} />
                 <ToastContainer />

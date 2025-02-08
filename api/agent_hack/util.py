@@ -18,7 +18,7 @@ async def load_or_query(
 ) -> dict[str, Any]:
     if cacheEntityName is None:
         cacheEntityName = entityName
-    cacheFilePath = f'../secrets/{source}-{cacheEntityName}.json'
+    cacheFilePath = f'../data/{source}-{cacheEntityName}.json'
     fileExists = await file_util.file_exists(filePath=cacheFilePath)
     fileAgeMillis = await file_util.get_file_age_millis(filePath=cacheFilePath) if fileExists else 0
     if fileExists and (fileAgeMillis / 1000) < expirySeconds:

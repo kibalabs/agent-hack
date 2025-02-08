@@ -33,6 +33,7 @@ tmp/
 cache/
 artifacts/
 secrets/
+data/
 
 # Python
 __pycache__/

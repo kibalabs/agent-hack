@@ -1,3 +1,2 @@
-# kiba-core[types]==0.5.3.dev6
--e /Users/krishan/Projects/core-py[types]
+kiba-core[types]==0.5.3.dev7
 kiba-build==0.1.10

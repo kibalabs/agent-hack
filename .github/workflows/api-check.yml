@@ -1,0 +1,61 @@
+name: check
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'api/**'
+      - '.github/workflows/api-check.yml'
+jobs:
+  api-build:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_IMAGE: build
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Build docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./api/
+          load: true
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
+          tags: ${{ env.DOCKER_IMAGE }}
+      - name: Run lint
+        run: |
+          docker run --name lint-check $DOCKER_IMAGE make lint-check-ci
+          docker cp lint-check:/app/lint-check-results.json ./lint-check-results.json
+      - name: Upload lint results
+        uses: kibalabs/github-action-create-annotations@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          json-file-path: ./lint-check-results.json
+          check-name: api-lint-check
+          fail-on-error: false
+          path-prefix: ./api/
+      # - name: Run type-check
+      #   run: |
+      #     docker run --name type-check $DOCKER_IMAGE make type-check-ci
+      #     docker cp type-check:/app/type-check-results.json ./type-check-results.json
+      # - name: Upload type-check results
+      #   uses: kibalabs/github-action-create-annotations@main
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     json-file-path: ./type-check-results.json
+      #     check-name: api-type-check
+      #     fail-on-error: false
+      #     path-prefix: ./api/
+      - name: Run security-check
+        run: |
+          docker run --name security-check $DOCKER_IMAGE make security-check-ci
+          docker cp security-check:/app/security-check-results.json ./security-check-results.json
+      - name: Upload security-check results
+        uses: kibalabs/github-action-create-annotations@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          json-file-path: ./security-check-results.json
+          check-name: api-security-check
+          fail-on-error: false
+          path-prefix: ./api/
