@@ -72,10 +72,12 @@ export function ChatPage(): React.ReactElement {
         </Stack>
       </Stack.Item>
       <SingleLineInput
+        inputWrapperVariant='chatInput'
         isEnabled={!isLoading}
         value={input}
         onValueChanged={setInput}
         shouldAutofocus={true}
+        placeholderText='Ask Yield Seeker...'
       />
     </Stack>
   );

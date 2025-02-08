@@ -5,7 +5,7 @@ export const buildHookeTheme = (): ITheme => {
   const textThemes: ThemeMap<ITextTheme> = {
     ...baseTheme.texts,
     default: mergeTheme(baseTheme.texts.default, {
-      'font-family': 'Montserrat, sans-serif',
+      'font-family': '"IBM Plex Mono", sans-serif',
       'font-weight': '400',
     }),
     header1: {
@@ -38,9 +38,12 @@ export const buildHookeTheme = (): ITheme => {
       brandPrimary: 'rgb(39, 236, 111)',
       warning: '#cf9f04',
     },
+    dimensions: {
+      borderRadius: '0.2em',
+    },
     fonts: {
       main: {
-        url: 'https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap',
+        url: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap',
       },
     },
     texts: textThemes,
@@ -137,11 +140,21 @@ export const buildHookeTheme = (): ITheme => {
       },
     },
     inputWrappers: {
-      default: {
+      chatInput: {
         normal: {
           default: {
             background: {
               'background-color': 'transparent',
+              'border-width': '1px 0 0 0',
+              'caret-color': '$colors.brandPrimary',
+              'caret-width': '0.5em',
+              'border-color': '$colors.textClear80',
+              'padding': `${baseTheme.dimensions.paddingWide} ${baseTheme.dimensions.paddingWide2}`,
+            },
+          },
+          focus: {
+            background: {
+              'border-color': '$colors.brandPrimaryClear25',
             },
           },
         },
