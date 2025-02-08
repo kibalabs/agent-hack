@@ -2,9 +2,10 @@ import base64
 import os
 from typing import Annotated
 
-from eth_account.messages import encode_defunct
-from fastapi import FastAPI, Header
 from core.exceptions import UnauthorizedException
+from eth_account.messages import encode_defunct
+from fastapi import FastAPI
+from fastapi import Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from web3 import Web3

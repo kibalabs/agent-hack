@@ -4,7 +4,15 @@ from typing import AsyncIterator
 from typing import Dict
 from typing import List
 
-from cdp_agentkit_core.actions import CDP_ACTIONS
+from cdp_agentkit_core.actions.address_reputation import AddressReputationAction
+from cdp_agentkit_core.actions.deploy_contract import DeployContractAction
+from cdp_agentkit_core.actions.deploy_token import DeployTokenAction
+from cdp_agentkit_core.actions.get_balance import GetBalanceAction
+from cdp_agentkit_core.actions.get_wallet_details import GetWalletDetailsAction
+from cdp_agentkit_core.actions.morpho.withdraw import MorphoWithdrawAction
+from cdp_agentkit_core.actions.trade import TradeAction
+from cdp_agentkit_core.actions.transfer import TransferAction
+from cdp_agentkit_core.actions.wrap_eth import WrapEthAction
 from core.util import file_util
 from langchain.agents import AgentExecutor
 from langchain_core.messages import AIMessage
@@ -15,6 +23,7 @@ from langgraph.prebuilt import create_react_agent
 
 from agent_hack.kiba_cdp_agentkit_wrapper import KibaCdpAgentkitWrapper
 from agent_hack.kiba_cdp_tool import KibaCdpTool
+from agent_hack.morpho_deposit_action import MorphoDepositAction
 from agent_hack.morpho_list_vaults_action import MorphoListVaultsAction
 from agent_hack.sign_message_action import SignMessageAction
 
@@ -53,7 +62,16 @@ class AgentManager:
         walletData = agentkit.export_wallet()
         await file_util.write_file(filePath=walletDataFilePath, content=walletData)
         actions = [
-            *CDP_ACTIONS,
+            AddressReputationAction(),
+            DeployContractAction(),
+            DeployTokenAction(),
+            GetBalanceAction(),
+            GetWalletDetailsAction(),
+            MorphoDepositAction(),
+            MorphoWithdrawAction(),
+            TradeAction(),
+            TransferAction(),
+            WrapEthAction(),
             SignMessageAction(),
             MorphoListVaultsAction(),
         ]
