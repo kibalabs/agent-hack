@@ -43,6 +43,7 @@ export class ChatService {
       method: 'POST',
       headers: this.getHeaders(authToken),
       body: JSON.stringify(request),
+      credentials: 'same-origin',
     });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -56,6 +57,7 @@ export class ChatService {
     const response = await fetch(url.toString(), {
       method: 'GET',
       headers: this.getHeaders(authToken),
+      credentials: 'same-origin',
     });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
