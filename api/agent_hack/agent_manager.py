@@ -139,6 +139,14 @@ class AgentManager:
                 'content': 'I\'m here to find you the best yield possible. I\'ll do everything for you but I need to understand your needs first. Let\'s get started by understanding what you\'re looking for in your yield-seeking adventures.',
                 'isUser': False,
             },
+            {
+                'content': 'I\'ve created a wallet for you. To get the address or balance just ask me "what is my wallet address?" or "what is my balance?". You can transfer money into the wallet using whatever means you already use. To transfer money out of the wallet just ask me to transfer to a wallet address.',
+                'isUser': False,
+            },
+            {
+                'content': 'Let\'s get started. What do you want to do?',
+                'isUser': False,
+            },
         ]
         async with AsyncSqliteSaver.from_conn_string(self.sqliteDbPath) as checkpointer:
             latestCheckpoint = await checkpointer.aget(config=config)

@@ -64,6 +64,7 @@ def _calculate_token_quality_factor(token: uniswap.TokenWithPools | None) -> flo
     volumeFactor = min(1.0, max(0.0, (token.volumeUSD - MIN_VOLUME_USD) / (GOOD_VOLUME_USD - MIN_VOLUME_USD)))
     txFactor = min(1.0, max(0.0, (token.txCount - MIN_TX_COUNT) / (GOOD_TX_COUNT - MIN_TX_COUNT)))
     weightedFactor = (tvlFactor * 0.5) + (volumeFactor * 0.3) + (txFactor * 0.2)
+    print(token.address, 'weightedFactor', weightedFactor)
     return weightedFactor
 
 
@@ -98,8 +99,7 @@ async def list_morpho_yield_options(chainId: int) -> list[YieldOption]:
             aerodromeFactor = _calculate_token_quality_factor(aerodromeToken)
             qualityFactor = max(uniswapFactor, aerodromeFactor)
             adjustedRewardApy = reward.apy * qualityFactor
-            riskAdjustedApy = adjustedRewardApy + vault.baseApy
-            overallRiskAdjustedApy += riskAdjustedApy
+            overallRiskAdjustedApy += adjustedRewardApy
             rewards.append(
                 YieldOptionReward(
                     asset=Asset(
@@ -114,7 +114,7 @@ async def list_morpho_yield_options(chainId: int) -> list[YieldOption]:
                         spotPriceEth=reward.asset.spotPriceEth,
                     ),
                     apy=reward.apy,
-                    riskAdjustedApy=riskAdjustedApy,
+                    riskAdjustedApy=adjustedRewardApy,
                     uniswapTotalValueLockedUSD=uniswapToken.totalValueLockedUSD if uniswapToken else None,
                     uniswapVolumeUSD=uniswapToken.volumeUSD if uniswapToken else None,
                     uniswapTxCount=uniswapToken.txCount if uniswapToken else None,
